@@ -1,28 +1,50 @@
+import { useState } from 'react';
+import Layout from '@/components/Layout';
+import Registry from '@/pages/Registry';
+import NewShipment from '@/pages/NewShipment';
+import ShipmentDetail from '@/pages/ShipmentDetail';
+import Reports from '@/pages/Reports';
+import Directories from '@/pages/Directories';
+import Certificates from '@/pages/Certificates';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+type Page = 'registry' | 'new-shipment' | 'view-shipment' | 'reports' | 'directories' | 'certificates';
 
-const queryClient = new QueryClient();
+export default function App() {
+  const [page, setPage] = useState<Page>('registry');
+  const [viewId, setViewId] = useState<number | null>(null);
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  const navigate = (p: string) => setPage(p as Page);
 
-export default App;
+  const handleViewShipment = (id: number) => {
+    setViewId(id);
+    setPage('view-shipment');
+  };
+
+  const handleNewSuccess = (id: number) => {
+    setViewId(id);
+    setPage('view-shipment');
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const layoutPage = page === 'view-shipment' ? 'registry' : page;
+
+  return (
+    <Layout currentPage={layoutPage} onNavigate={navigate}>
+      {page === 'registry' && (
+        <Registry onViewShipment={handleViewShipment} onNewShipment={() => setPage('new-shipment')} />
+      )}
+      {page === 'new-shipment' && (
+        <NewShipment onSuccess={handleNewSuccess} onCancel={() => setPage('registry')} />
+      )}
+      {page === 'view-shipment' && viewId !== null && (
+        <ShipmentDetail id={viewId} onBack={() => setPage('registry')} onPrint={handlePrint} />
+      )}
+      {page === 'reports' && <Reports />}
+      {page === 'directories' && <Directories />}
+      {page === 'certificates' && <Certificates />}
+    </Layout>
+  );
+}
