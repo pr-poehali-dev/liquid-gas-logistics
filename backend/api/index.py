@@ -125,6 +125,42 @@ def handler(event: dict, context) -> dict:
             rows = cur.fetchall()
             return resp(200, [{'id': r[0], 'name': r[1], 'product_code': r[2], 'unit': r[3], 'danger_class': r[4], 'un_number': r[5]} for r in rows])
 
+        # POST /products
+        if path == '/products' and method == 'POST':
+            cur.execute("INSERT INTO products (name, product_code, unit, danger_class, un_number) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+                        (body['name'], body.get('product_code', ''), body.get('unit', 'л'), body.get('danger_class', ''), body.get('un_number', '')))
+            new_id = cur.fetchone()[0]
+            conn.commit()
+            return resp(201, {'id': new_id, 'message': 'Товар добавлен'})
+
+        # GET /senders
+        if path == '/senders' and method == 'GET':
+            cur.execute("SELECT id, name, inn, address, phone, is_active FROM senders WHERE is_active = TRUE ORDER BY name")
+            rows = cur.fetchall()
+            return resp(200, [{'id': r[0], 'name': r[1], 'inn': r[2], 'address': r[3], 'phone': r[4], 'is_active': r[5]} for r in rows])
+
+        # POST /senders
+        if path == '/senders' and method == 'POST':
+            cur.execute("INSERT INTO senders (name, inn, address, phone) VALUES (%s, %s, %s, %s) RETURNING id",
+                        (body['name'], body.get('inn', ''), body.get('address', ''), body.get('phone', '')))
+            new_id = cur.fetchone()[0]
+            conn.commit()
+            return resp(201, {'id': new_id, 'message': 'Грузоотправитель добавлен'})
+
+        # GET /receivers
+        if path == '/receivers' and method == 'GET':
+            cur.execute("SELECT id, name, inn, address, phone, is_active FROM receivers WHERE is_active = TRUE ORDER BY name")
+            rows = cur.fetchall()
+            return resp(200, [{'id': r[0], 'name': r[1], 'inn': r[2], 'address': r[3], 'phone': r[4], 'is_active': r[5]} for r in rows])
+
+        # POST /receivers
+        if path == '/receivers' and method == 'POST':
+            cur.execute("INSERT INTO receivers (name, inn, address, phone) VALUES (%s, %s, %s, %s) RETURNING id",
+                        (body['name'], body.get('inn', ''), body.get('address', ''), body.get('phone', '')))
+            new_id = cur.fetchone()[0]
+            conn.commit()
+            return resp(201, {'id': new_id, 'message': 'Грузополучатель добавлен'})
+
         # ===== СЕРТИФИКАТЫ =====
 
         # GET /certificates

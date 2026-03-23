@@ -25,6 +25,8 @@ export interface Responsible { id: number; full_name: string; position: string; 
 export interface Vehicle { id: number; reg_number: string; brand: string; vehicle_type: string; is_active: boolean; }
 export interface Trailer { id: number; reg_number: string; brand: string; capacity_liters: number | null; is_active: boolean; }
 export interface Certificate { id: number; cert_number: string; cert_type: string; issued_by: string; issued_date: string; expires_date: string; notes: string; is_active: boolean; product_name: string; product_id: number; }
+export interface Sender { id: number; name: string; inn: string; address: string; phone: string; is_active: boolean; }
+export interface Receiver { id: number; name: string; inn: string; address: string; phone: string; is_active: boolean; }
 
 export interface Shipment {
   id: number;
